@@ -1,3 +1,4 @@
+// edition=2018 NLL version
 // Concurrent DNS lookups (only used when --use-all-a-records)
 //
 // Tested via a CLI app which just passes all CLI args to this to resolve.
@@ -43,13 +44,10 @@ impl ResolverWrapper {
         if hosts.is_empty() {
             return;
         }
-	let async_resolver = &self.async_resolver;
-	let hosts_clone = hosts.clone();
-
         // create a future per lookup request
-        let lookup_futures = hosts_clone
+        let lookup_futures = hosts
             .iter()
-            .map(|x| async_resolver.lookup_ip(x.as_str()));
+            .map(|x| self.async_resolver.lookup_ip(x.as_str()));
 
         let mut lookup_futures = future::select_all(lookup_futures);
         // loops without explicit termination conditions make me nervous.

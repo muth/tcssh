@@ -91,9 +91,17 @@ impl App {
     pub fn run(&mut self, rself: &Rapp) -> Result<()> {
         self.xdisplay = x::XDisplay::new()?;
 
-        if let Some(ref evaluate) = self.getopt.evaluate {
-            evaluate::evaluate_commands(evaluate, &self.config);
-            self.exit_prog();
+	// NLL version is nicer
+        //if let Some(ref mut evaluate) = self.getopt.evaluate { // NLL -mut
+        //    evaluate::evaluate_commands(evaluate, &self.config);
+        //    self.exit_prog();
+        //}
+	// But without NLL we need another level
+        if self.getopt.evaluate.is_some() {
+	    if let Some(ref evaluate) = self.getopt.evaluate { // NLL -mut
+		evaluate::evaluate_commands(evaluate, &self.config);
+	    }
+	    self.exit_prog();
         }
 
         // I'd like to write the next 3 lines as one
@@ -158,24 +166,33 @@ impl App {
         self.xdisplay.flush();
 
         self.sleep(200);
-        if let Some(ref mut gtkstuff) = self.gtkstuff {
-            if self.servers.is_empty() {
-                // There are no servers/xterms, then go ahead and show it right away.
-                gtkstuff.show_main_window();
-            } else {
-                // This seems odd, we're show_console(), but doing the opposite.
-                // TODO write comment explaining this, or remove it.
-                gtkstuff.hide_main_window();
+	// NLL edtion 2018 makes this clearer
+        //if let Some(ref mut gtkstuff) = self.gtkstuff {
+	// and counter done in line.
+	// But for without that, we need this extra Option<u8> bit
+	if self.gtkstuff.is_some() {
+	    let mut counter = None;
+	    if let Some(ref mut gtkstuff) = self.gtkstuff {
+		if self.servers.is_empty() {
+		    // There are no servers/xterms, then go ahead and show it right away.
+		    gtkstuff.show_main_window();
+		} else {
+		    // This seems odd, we're show_console(), but doing the opposite.
+		    // TODO write comment explaining this, or remove it.
+		    gtkstuff.hide_main_window();
 
-                // perl cssh slept "for a moment to give WM time to bring console back"
-                //self.sleep(500);
-                // We avoid explicit sleep, but do so indirectly via stuffing an event
-                // into our event queue, and wait for our idle callback to handle it later.
+		    // perl cssh slept "for a moment to give WM time to bring console back"
+		    //self.sleep(500);
+		    // We avoid explicit sleep, but do so indirectly via stuffing an event
+		    // into our event queue, and wait for our idle callback to handle it later.
 
-                if let Some(counter) = gtkstuff.get_main_window_request_delay() {
-                    self.add_event_show_console(counter);
-                }
+		    counter = gtkstuff.get_main_window_request_delay();
+		}
             }
+	    if let Some(counter) = counter {
+		// NLL would allow this to be used where it's set
+		self.add_event_show_console(counter);
+	    }
         }
         Ok(())
     }
@@ -221,12 +238,15 @@ impl App {
                         &self.me,
                     ) {
                         eprintln!("Failed top open windows {:?}", e);
-                    } else if let Some(ref g) = self.gtkstuff {
-                        // reproduce g.build_hosts_menu() here due to borrowing.
-                        for (ref server_key, ref mut server) in self.servers.iter_mut() {
-                            g.build_host_menu(server_key, server, rapp);
-                        }
-                        g.change_main_window_title(self);
+                    } else if self.gtkstuff.is_some() {
+			// NLL lets us shorten this.. but for now..
+			if let Some(ref g) = self.gtkstuff {
+			    // reproduce g.build_hosts_menu() here due to borrowing.
+			    for (ref server_key, ref mut server) in self.servers.iter_mut() {
+				g.build_host_menu(server_key, server, rapp);
+			    }
+			    g.change_main_window_title(self);
+			}
                         let _ = self.retile_hosts(false, false);
                     }
                 }
@@ -237,12 +257,14 @@ impl App {
 
     // handle CLI arg --list
     fn handle_list(&mut self) {
+	// More NLL code which gets cleaner with NLL and edition 2018, instead a flag
+	let mut flag = false;
+	let (tab, eol) = if self.getopt.quiet {
+	    ("", ' ')
+	} else {
+	    ("\t", '\n')
+	};
         if let Some(list) = &self.getopt.list {
-            let (tab, eol) = if self.getopt.quiet {
-                ("", ' ')
-            } else {
-                ("\t", '\n')
-            };
             if list.is_empty() {
                 if !self.getopt.quiet {
                     println!("Available cluster tags:");
@@ -274,19 +296,22 @@ impl App {
                 }
                 self.getopt.hosts.clear();
                 self.getopt.hosts.push(list.to_string());
-                match self.resolve_names(true) {
-                    Ok(()) => {
-                        for host in &self.getopt.hosts {
-                            print!("{}{}{}", tab, host, eol);
-                        }
-                        println!();
-                    }
-                    Err(e) => {
-                        println!("Error resolve_names(): {:?}", e);
-                    }
-                }
+		flag = true;
             }
         }
+	if flag {
+	    match self.resolve_names(true) {
+		Ok(()) => {
+		    for host in &self.getopt.hosts {
+			print!("{}{}{}", tab, host, eol);
+		    }
+		    println!();
+		}
+		Err(e) => {
+		    println!("Error resolve_names(): {:?}", e);
+		}
+	    }
+	}
     }
 
     pub fn resolve_names(&mut self, run_external: bool) -> Result<()> {
@@ -428,14 +453,19 @@ impl App {
             eprintln!("Failed top open windows {:?}", e);
             // Show
         }
+	// more non NLL flag nonsense
+	let mut flag = false;
         if let Some(ref g) = self.gtkstuff {
             // reproduce g.build_hosts_menu() here due to borrowing.
             for (ref server_key, ref mut server) in self.servers.iter_mut() {
                 g.build_host_menu(server_key, server, rapp);
             }
             g.change_main_window_title(self);
-            let _ = self.retile_hosts(false, false);
+	    flag = true;
         }
+	if flag {
+	    let _ = self.retile_hosts(false, false);
+	}
     }
 
     pub fn sleep(&self, ms: u64) {

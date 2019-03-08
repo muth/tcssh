@@ -28,14 +28,14 @@ impl XDisplay {
                     Err(_) => {
                         // Internal null byte?
                         eprintln!("Error decoding env var DISPLAY, falling back to 'unix:0'");
-                        CString::new("unix:0\0").unwrap()
+                        CString::new("unix:0").unwrap()
                     }
                 }
             }
             Err(_) => {
                 // perl cssh injects unix:0 if DISPLAY env isn't set
                 eprintln!("Can't find DISPLAY -- guessing 'unix:0'");
-                CString::new("unix:0\0").unwrap()
+                CString::new("unix:0").unwrap()
             }
         };
 

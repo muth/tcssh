@@ -33,7 +33,7 @@ pub struct Getopt {
     /// Use supplied file the configuration file.
     /// Defaults is $CONFIG_DIR/config
     /// where $CONFIG_DIR is either ~/.tcssh or ~/.clusterssh
-    #[structopt(short = "C", long = "config-file")]
+    #[structopt(short = "C", long = "config-file", parse(from_os_str))]
     config_file: Option<PathBuf>,
 
     // perl cssh allowed '--debug level' and multiple --debug options without args.

@@ -1,7 +1,20 @@
 //#![feature(stmt_expr_attributes)] // so retile.rs can use #[rustfmt::skip]
 
+extern crate dirs;
+extern crate futures;
+extern crate gdk_sys;
+extern crate gdk;
+extern crate gtk;
 #[macro_use]
 extern crate lazy_static;
+extern crate libc;
+extern crate nix;
+extern crate regex;
+#[macro_use]
+extern crate structopt;
+extern crate tokio;
+extern crate trust_dns_resolver;
+extern crate x11;
 
 mod app;
 mod candstr;

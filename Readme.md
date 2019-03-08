@@ -70,4 +70,26 @@ and you're connecting to a host with multiple A records.
 
 
 
-If you get build errors.  Please note there is a .cargo/config file which is easy to overlook.
+If you get build errors.
+
+1) Re: "edition 2018", then pull tcssh from git again.  I was using rust 1.33 stable/1.35 nightly.
+So used some features not available in earlier versions of rust.
+Those have been fixed and pushed.
+
+2) Re: "error: linking with `cc` failed: exit code: 1", then
+    apt-get install libx11-dev
+
+3) Re link error with "note:
+    /usr/bin/ld: cannot find -latk-1.0
+    /usr/bin/ld: cannot find -lcairo
+    /usr/bin/ld: cannot find -lcairo-gobject
+    /usr/bin/ld: cannot find -lgdk-3
+    /usr/bin/ld: cannot find -lgdk_pixbuf-2.0
+    /usr/bin/ld: cannot find -lgio-2.0
+    /usr/bin/ld: cannot find -lglib-2.0
+    /usr/bin/ld: cannot find -lgobject-2.0
+    /usr/bin/ld: cannot find -lgtk-3
+    /usr/bin/ld: cannot find -lpango-1.0
+then
+    apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev
+
