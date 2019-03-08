@@ -1,0 +1,42 @@
+[package]
+name = "tcssh"
+version = "0.2.0"
+# ^ If you change the version, then update src/macros.rs VERSION_JUST_NUMBER and VERSION_LONG
+authors = ["Mark Nieweglowski <connect@tcssh.net>"]
+edition = "2018"
+license = "GPL-3.0+"
+description = "Transparent Cluster SSH"
+keywords = ["ssh", "xterm", "cli"]
+categories = ["command-line-interface"]
+
+build = "build.rs"
+links = "X11"
+
+#[build-dependencies.pkg-config]
+#version = "0.3.8"
+# ^ I had this for a while, but without it builds still work for me.
+# Leave it here temporarily, as more people try to build this
+# it may prove useful in some situations.
+
+[dependencies.gtk]
+version = "0.5.0"
+features = ["v3_14"]
+# v3.14 for ListBoxExt.get_selected_rows()
+# https://gtk-rs.org/docs/gtk/trait.ListBoxExt.html
+
+[dependencies]
+dirs = "*"
+futures = "*"
+gdk = "*"
+gdk-sys = "*"
+lazy_static = "*"
+libc = "*"
+nix = "*"
+regex = "*"
+structopt = { version = "0.2", default-features = false }
+# ^ docs start "If you want to disable ..."
+# which leads me to believe those features are in flux
+# https://docs.rs/structopt/0.2.14/structopt/
+tokio = "*"
+trust-dns-resolver = "*"
+x11 = "*"
