@@ -91,3 +91,6 @@ Those have been fixed and pushed.
 then
     apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev libx11-dev
 
+
+If the default is too transparent then opacity is controlled by -O or --opacity
+1 = opaque, 0.5 = semi-transparent, 0 = transparent.
