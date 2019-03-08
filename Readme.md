@@ -8,9 +8,10 @@ and did DNS lookups serially before connecting to hosts.
 tcssh skips the DNS lookups in almost all cases, but when asked
 will perform the lookup in parallel.
 
-1) Install rust https://www.rust-lang.org/
-2) cargo build --release # prepare for 1.1G of intermediate files.
-3) ./target/release/tcssh 127.0.0.1
+1) apt-get install rustc # or if that doesn't work then install rust by https://www.rust-lang.org/ 
+2) apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev libx11-dev
+3) cargo build --release # prepare for 1.1G of intermediate files.
+4) ./target/release/tcssh --opacity 1 127.0.0.1
 
 
 Its main config directory is ~/.tcssh/ but if that does not exist
@@ -77,7 +78,9 @@ So used some features not available in earlier versions of rust.
 Those have been fixed and pushed.
 
 2) Re: "error: linking with `cc` failed: exit code: 1", then
+
 ...
+
     /usr/bin/ld: cannot find -latk-1.0
     /usr/bin/ld: cannot find -lcairo
     /usr/bin/ld: cannot find -lcairo-gobject
@@ -88,7 +91,9 @@ Those have been fixed and pushed.
     /usr/bin/ld: cannot find -lgobject-2.0
     /usr/bin/ld: cannot find -lgtk-3
     /usr/bin/ld: cannot find -lpango-1.0
+
 then
+
     apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev libx11-dev
 
 
