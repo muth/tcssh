@@ -77,9 +77,7 @@ So used some features not available in earlier versions of rust.
 Those have been fixed and pushed.
 
 2) Re: "error: linking with `cc` failed: exit code: 1", then
-    apt-get install libx11-dev
-
-3) Re link error with "note:
+...
     /usr/bin/ld: cannot find -latk-1.0
     /usr/bin/ld: cannot find -lcairo
     /usr/bin/ld: cannot find -lcairo-gobject
@@ -91,5 +89,5 @@ Those have been fixed and pushed.
     /usr/bin/ld: cannot find -lgtk-3
     /usr/bin/ld: cannot find -lpango-1.0
 then
-    apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev
+    apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev libx11-dev
 
