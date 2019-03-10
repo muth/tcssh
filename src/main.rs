@@ -10,7 +10,6 @@ extern crate lazy_static;
 extern crate libc;
 extern crate nix;
 extern crate regex;
-#[macro_use]
 extern crate structopt;
 extern crate tokio;
 extern crate trust_dns_resolver;
