@@ -10,12 +10,16 @@ will perform the lookup in parallel.
 
 1) apt-get install rustc # or if that doesn't work then install rust by https://www.rust-lang.org/ 
 2) apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev libx11-dev
-3) cargo build --release # prepare for 1.1G of intermediate files.
+3) cargo build --release # prepare for 1.1G of intermediate files. (see Build Errors)
 4) ./target/release/tcssh --opacity 1 127.0.0.1
+# 1 = opaque, 0.5 = semi-transparent, 0 = transparent.
 
 
-Its main config directory is ~/.tcssh/ but if that does not exist
-it will look for an existing ~/.clusterssh/ directory
+The config directory is ~/.tcssh/ but if that does not exist
+it will look for an existing ~/.clusterssh/ directory.
+
+    ./tcssh --dump-config # To see what can be configured
+    ./tcssh --help # for all options
 
 Features which tcch shares with cssh
 
@@ -37,6 +41,9 @@ tcssh also allows mosh to be used instead of ssh, if it called as such.
     ln -s tcssh tcmosh
     ./tcmosh
 
+
+# Common tcmosh errors
+
 If the xterm started by tcmosh closes too quickly to read any error,
 then you can debug it via 
 
@@ -53,6 +60,8 @@ so you adjust and
 and that may tell you to change your environment variable for LANG to something supporting UTF-8
 
 
+# Compatability
+
 tcssh is as backwards compatible with cssh as possible
 
 Where it is not compatible;
@@ -66,16 +75,22 @@ one more robust.
 No attempt is made to handle pasted text within the history window.
 
 The tag resolution and DNS resolution logic differs from cssh, but only
-if you have configured a tag which looks like an IPv6 address,
-and you're connecting to a host with multiple A records.
+if you're using --use-all-a-records,
+and asked for a host which resolves multiple IPs,
+and at least one of those IPs is a tag in "~/.tcssh/cluster or /etc/clusters.
+Perl cssh would expand that IP as a tag, while rust tcssh would not expand that IP as a tag.
+
+Hotkeys aren't enabled yet for macros (servername,hostname,username).
 
 
 
-If you get build errors.
+# Common Build Errors
 
-1) Re: "edition 2018", then pull tcssh from git again.  I was using rust 1.33 stable/1.35 nightly.
-So used some features not available in earlier versions of rust.
-Those have been fixed and pushed.
+1) If you get an error about "edition 2018", then
+
+    git checkout pre-2018
+
+And build again.
 
 2) Re: "error: linking with `cc` failed: exit code: 1", then
 
@@ -96,6 +111,3 @@ then
 
     apt-get install libatk1.0-dev libcairo2-dev libgdk-pixbuf2.0-dev libglib2.0-dev libgtk-3-dev libpango1.0-dev libx11-dev
 
-
-If the default is too transparent then opacity is controlled by -O or --opacity
-1 = opaque, 0.5 = semi-transparent, 0 = transparent.
