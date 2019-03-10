@@ -221,7 +221,7 @@ impl Default for Screen {
 #[derive(Debug)]
 pub struct Keymap {
     pub use_hotkeys: bool,
-    key_addhost: Cow<'static, str>,
+    pub key_addhost: Cow<'static, str>,
     key_clientname: Cow<'static, str>,
     pub key_history: Cow<'static, str>,
     key_localname: Cow<'static, str>,

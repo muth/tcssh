@@ -474,6 +474,7 @@ impl GtkStuff {
                 }
             }
         });
+        self.bind_accelerator(&app.config.keymap.key_addhost, &hosts_add);
     }
 
     fn bind_accelerator(&self, accel: &str, menu_item: &MenuItem) {
