@@ -166,8 +166,7 @@ pub struct Macros {
 impl Default for Macros {
     // Clippy warns about trivial re-exes r"%s" etc.
     // But these are user configurable, so may be arbitrarily complex.
-    //#[allow(clippy::trivial_regex)] // commented out because experimental
-    // ^ scoped lint `clippy::trivial_regex` is experimental (see issue #44690)
+    #[allow(clippy::trivial_regex)]
     fn default() -> Self {
         Self {
             enabled: true,
@@ -799,9 +798,7 @@ trait Add<T> {
     fn add(&mut self, key: &str, value: T);
 }
 
-// rust edition 2018 makes these lifetimes optional.
-// But for now add them so non-nightly can work
-impl<'a> Add<&'a str> for OutConfig {
+impl Add<&str> for OutConfig {
     fn add(&mut self, key: &str, value: &str) {
         self.buf += key;
         self.buf += value;
@@ -809,15 +806,15 @@ impl<'a> Add<&'a str> for OutConfig {
     }
 }
 
-impl<'a> Add<&'a Cow<'static, str>> for OutConfig {
-    fn add(&mut self, key: &str, value: &'a Cow<'static, str>) {
+impl Add<&Cow<'static, str>> for OutConfig {
+    fn add(&mut self, key: &str, value: &Cow<'static, str>) {
         self.buf += key;
         self.buf += value;
         self.buf += "\n";
     }
 }
 
-impl<'a> Add<&'a Option<String>> for OutConfig {
+impl Add<&Option<String>> for OutConfig {
     fn add(&mut self, key: &str, value: &Option<String>) {
         self.buf += key;
         if let Some(value) = value {
@@ -827,7 +824,7 @@ impl<'a> Add<&'a Option<String>> for OutConfig {
     }
 }
 
-impl<'a> Add<&'a Option<PathBuf>> for OutConfig {
+impl Add<&Option<PathBuf>> for OutConfig {
     fn add(&mut self, key: &str, value: &Option<PathBuf>) {
         self.buf += key;
         if let Some(value) = value {

@@ -3,7 +3,9 @@ name = "tcssh"
 version = "0.2.0"
 # ^ If you change the version, then update src/macros.rs VERSION_JUST_NUMBER and VERSION_LONG
 authors = ["Mark Nieweglowski <connect@tcssh.net>"]
-#edition = "2018"
+edition = "2018"
+# ^ If you get a build error about edition 2018, then either upgrade your rust (hint: rustup)
+# or "git checkout pre-2018"
 license = "GPL-3.0+"
 description = "Transparent Cluster SSH"
 keywords = ["ssh", "xterm", "cli"]
