@@ -22,6 +22,8 @@ use crate::reader;
 
 lazy_static! {
     static ref TERM_SIZE: Regex = Regex::new(r"^(\d+)x(\d+)$").expect("Regex error TERM_SIZE");
+    static ref SSH_CONFIG_META: Regex =
+        Regex::new(r"[!*%?,]").expect("Regex error SSH_CONFIG_META");
 }
 
 #[derive(Debug, Default)]
@@ -998,4 +1000,43 @@ fn perl_true(value: &str) -> bool {
     // perl false (in str context) is "" or "0"
     // perl true  (in str context) is "00", "0x0", " ", any other str
     !(value.is_empty() || value == "0")
+}
+
+pub fn parse_ssh_config_and_add_hosts(tags: &mut Vec<String>) {
+    if let Some(dir) = &mut dirs::home_dir() {
+        dir.push(".ssh");
+        if dir.is_dir() {
+            dir.push("config");
+            let file = dir;
+            if file.exists() {
+                let mut stags = Vec::new();
+                match reader::read_file(file, false, |key, value| match key {
+                    "Host" => {
+                        for value in value.split_whitespace() {
+                            if !SSH_CONFIG_META.is_match(value) {
+                                stags.push(value.to_string());
+                            }
+                        }
+                    }
+                    "HostName" => {
+                        if !SSH_CONFIG_META.is_match(value) {
+                            stags.push(value.to_string());
+                        }
+                    }
+                    _ => {}
+                }) {
+                    Ok(_) => {
+                        if !stags.is_empty() {
+                            tags.append(&mut stags);
+                            tags.sort_unstable();
+                            tags.dedup();
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!("Error parsing ~/.ssh/config {:?}", e);
+                    }
+                }
+            }
+        }
+    }
 }

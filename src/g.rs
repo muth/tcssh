@@ -21,9 +21,7 @@ use gtk::{
     WidgetExt, // for show_all()
     Window,
 };
-use std::cell::RefCell;
 use std::os::raw::c_uint;
-use std::rc::Rc;
 
 use crate::app;
 use crate::config;
@@ -371,7 +369,7 @@ impl GtkStuff {
                 (&"_Cancel", gtk::ResponseType::Reject.into()),
             ],
         );
-        let tags = app.cluster.list_tags();
+        let mut tags = app.cluster.list_tags();
         // perl cssh runs its external cluster command each time the dialog pops up,
         // and perl cssh removes its sig handler for the duration of the external
         // call (via local $SIG{CHLD} = undef;)
@@ -384,17 +382,31 @@ impl GtkStuff {
         //        }
         //     }
         // }
+        config::parse_ssh_config_and_add_hosts(&mut tags);
+
         let list_box = gtk::ListBox::new();
         list_box.set_selection_mode(gtk::SelectionMode::Multiple);
         list_box.set_activate_on_single_click(true);
+        let mut max_len = 20;
         for tag in &tags {
+            let len = tag.len();
+            if len > max_len {
+                max_len = len;
+            }
             let label = gtk::Label::new(Some(tag.as_str()));
+            label.set_justify(gtk::Justification::Left);
+            label.set_halign(gtk::Align::Start);
             let list_box_row = gtk::ListBoxRow::new();
             list_box_row.add(&label);
             list_box.add(&list_box_row);
         }
+        let max_len: i32 = if max_len < (i32::max_value() as usize) {
+            max_len as i32
+        } else {
+            i32::max_value()
+        };
         let text_entry = Entry::new();
-        text_entry.set_width_chars(20);
+        text_entry.set_width_chars(max_len);
         text_entry.set_visibility(true);
 
         let dialog_box = Box::new(gtk::Orientation::Vertical, 10);
@@ -409,63 +421,20 @@ impl GtkStuff {
             // Who knows what font gtk is using in this dialog, 16 for height seems
             // as good a guess as any.
             scroll.add(&list_box);
-            dialog_box.add(&scroll);
+            dialog_box.pack_start(&scroll, true, true, 0);
         } else {
-            dialog_box.add(&list_box);
+            dialog_box.pack_start(&list_box, true, true, 0);
         }
-        dialog_box.add(&text_entry);
+        dialog_box.pack_end(&text_entry, false, false, 0);
 
         let content_area = dialog.get_content_area();
-        content_area.add(&dialog_box);
+        content_area.pack_start(&dialog_box, true, true, 0);
         content_area.show_all();
-
-        // gtk's ListBox with gtk::SelectionMode::Multiple seems odd.
-        // 1) On first .run() the first item is selected, even though
-        // we call .unselect_all().  But on subsequent calls to .run() the
-        // .unselect_all() request is obeyed (Fixed: text_engry.grab_focus())
-        // 2) The documentation for ListBox states that CTRL double click,
-        // is how we can deselect items.  But most dialogs I'm used to,
-        // allow select/deselect based on a single click.
-        // So we store a Vec<bool> to allow single click select/deselect.
-        // And since we have to use that Vec within two 'static callbacks
-        // we have to wrap it in an Rc/RefCell, and leave it allocated.
-
-        let selected = Vec::with_capacity(n);
-        let selected = Rc::new(RefCell::new(selected));
-        let selected_clone = selected.clone();
-        list_box.connect_row_activated(move |list_box, row| {
-            let i = row.get_index();
-            if i >= 0 {
-                let i = i as usize;
-                if i < n {
-                    if let Ok(ref mut selected) = selected_clone.try_borrow_mut() {
-                        let tmp = selected[i];
-                        if tmp {
-                            list_box.emit_toggle_cursor_row();
-                        }
-                        selected[i] = !tmp;
-                    }
-                }
-            }
-        });
 
         let rapp_clone = rapp.clone();
         hosts_add.connect_activate(move |_| {
             text_entry.set_text("");
             list_box.unselect_all();
-            if n > 0 {
-                if let Ok(ref mut selected) = selected.try_borrow_mut() {
-                    if selected.is_empty() {
-                        for _ in 0..n {
-                            selected.push(false);
-                        }
-                    } else {
-                        for elem in selected.iter_mut() {
-                            *elem = false;
-                        }
-                    }
-                }
-            }
             text_entry.grab_focus();
             let button_pressed = dialog.run();
             dialog.hide(); // .hide() is async. cannot create/tile via an event.
