@@ -799,7 +799,7 @@ trait Add<T> {
 
 // rust edition 2018 makes these lifetimes optional.
 // But for now add them so non-nightly can work
-impl <'a>Add<&'a str> for OutConfig {
+impl<'a> Add<&'a str> for OutConfig {
     fn add(&mut self, key: &str, value: &str) {
         self.buf += key;
         self.buf += value;
@@ -807,7 +807,7 @@ impl <'a>Add<&'a str> for OutConfig {
     }
 }
 
-impl <'a>Add<&'a Cow<'static, str>> for OutConfig {
+impl<'a> Add<&'a Cow<'static, str>> for OutConfig {
     fn add(&mut self, key: &str, value: &'a Cow<'static, str>) {
         self.buf += key;
         self.buf += value;
@@ -815,7 +815,7 @@ impl <'a>Add<&'a Cow<'static, str>> for OutConfig {
     }
 }
 
-impl <'a>Add<&'a Option<String>> for OutConfig {
+impl<'a> Add<&'a Option<String>> for OutConfig {
     fn add(&mut self, key: &str, value: &Option<String>) {
         self.buf += key;
         if let Some(value) = value {
@@ -825,7 +825,7 @@ impl <'a>Add<&'a Option<String>> for OutConfig {
     }
 }
 
-impl <'a>Add<&'a Option<PathBuf>> for OutConfig {
+impl<'a> Add<&'a Option<PathBuf>> for OutConfig {
     fn add(&mut self, key: &str, value: &Option<PathBuf>) {
         self.buf += key;
         if let Some(value) = value {

@@ -42,12 +42,12 @@ where
         if !continuation {
             line_string.clear();
         } else if let Some(n) = nll_flag {
-	    line_string.truncate(n);
-	    nll_flag = None;
+            line_string.truncate(n);
+            nll_flag = None;
         } else if let Some(s) = nll_string {
-	    line_string = s;
-	    nll_string = None;
-	}
+            line_string = s;
+            nll_string = None;
+        }
         // EOF
         if buf_reader.read_line(&mut line_string)? == 0 && !continuation {
             break;
@@ -87,15 +87,15 @@ where
                     continuation_start = i;
                     let n = i + line.len();
                     if n < line_string.len() {
-			nll_flag = Some(n);
+                        nll_flag = Some(n);
                     }
                 }
-		// NLL code
+                // NLL code
                 //None => line_string = line.to_string(), // impossible, but fall back to another heap allocation
-		// non-NLL code
+                // non-NLL code
                 None => {
-		    nll_string = Some(line.to_string()); // impossible, but fall back to another heap allocation
-		}
+                    nll_string = Some(line.to_string()); // impossible, but fall back to another heap allocation
+                }
             }
             continue;
         }

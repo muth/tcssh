@@ -2,8 +2,8 @@
 
 extern crate dirs;
 extern crate futures;
-extern crate gdk_sys;
 extern crate gdk;
+extern crate gdk_sys;
 extern crate gtk;
 #[macro_use]
 extern crate lazy_static;

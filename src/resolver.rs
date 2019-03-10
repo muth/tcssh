@@ -43,8 +43,8 @@ impl ResolverWrapper {
         if hosts.is_empty() {
             return;
         }
-	let async_resolver = &self.async_resolver;
-	let hosts_clone = hosts.clone();
+        let async_resolver = &self.async_resolver;
+        let hosts_clone = hosts.clone();
 
         // create a future per lookup request
         let lookup_futures = hosts_clone
